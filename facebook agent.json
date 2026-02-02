@@ -1,0 +1,240 @@
+{
+  "name": "facebook agent",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Facebook AI Agent",
+        "formDescription": "Using Facebook AI agent to collect data of different personels from a specific location or region",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "What are you looking for?",
+              "placeholder": "Enter",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Location",
+              "placeholder": "Enter Location",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "11ec1aab-d273-495a-9985-99b59c8178a4",
+      "name": "On form submission",
+      "webhookId": "75ccb883-195c-4451-b828-b3ecdfb641a9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "your api key",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"focusOnPaidAds\": false,\n    \"forceExactMatch\": false,\n    \"includeIcons\": false,\n    \"includeUnfilteredResults\": false,\n    \"maxPagesPerQuery\": 1,\n    \"maximumLeadsEnrichmentRecords\": 0,\n    \"mobileResults\": false,\n    \"perplexitySearch\": {\n        \"enablePerplexity\": false,\n        \"returnImages\": false,\n        \"returnRelatedQuestions\": false\n    },\n    \"queries\": \"site:facebook.com + {{ $json['What are you looking for?'] }} {{ $json.Location }}\",\n    \"resultsPerPage\": 10,\n    \"saveHtml\": false,\n    \"saveHtmlToKeyValueStore\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c6ad95b5-52f9-4278-8e82-5990623a45a3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an array to store all simplified results\nlet allResults = [];\n\n// Loop through each incoming item\nitems.forEach(item => {\n    const data = item.json;\n\n    // Skip if no organicResults\n    if (!data.organicResults) return;\n\n    // Loop through each organic result in this item\n    data.organicResults.forEach(result => {\n        allResults.push({\n            title: result.title || \"\",\n            url: result.url || \"\",\n            description: result.description || \"\",\n            emphasizedKeywords: result.emphasizedKeywords || [],\n            reactions: result.reactions || \"\",\n            followers: result.followers || result.followersCount || 0,\n            lastUpdated: result.lastUpdated || \"\",\n            position: result.position || null\n        });\n    });\n});\n\n// Return each result as its own item\nreturn allResults.map(res => ({ json: res }));\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d28f48bc-5608-456f-a92f-70c00fc5f73b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ReE8ILnOxB4iufKT3paSUJ6XHv6WOwZqdwsvp3-P09I",
+          "mode": "list",
+          "cachedResultName": "facebook project ,,,",
+          "cachedResultUrl": "your api key"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "your api key"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "title": "={{ $json.simplifiedResults[0].title }}",
+            "url": "={{ $json.simplifiedResults[0].url }}",
+            "description": "={{ $json.simplifiedResults[0].description }}",
+            "reactions": "={{ $json.simplifiedResults[0].reactions }}",
+            "lastUpdated": "={{ $json.simplifiedResults[0].lastUpdated }}",
+            "emphasizedKeywords": "={{ $json.emphasizedKeywords[0] }}",
+            "position": "={{ $json.position }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "followers",
+              "displayName": "followers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reactions",
+              "displayName": "reactions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lastUpdated",
+              "displayName": "lastUpdated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "emphasizedKeywords",
+              "displayName": "emphasizedKeywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "position",
+              "displayName": "position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        0
+      ],
+      "id": "e065e902-40c1-424e-b152-4b11175996ed",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JB5OlTyLRU6rMeFF",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "d6855c79-19ae-4e6d-ba0e-8433dcc21274",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d1d74f46d863be8bd4323c396add3bc3ea5a7e09b4fc1e21fbb651b0003668ec"
+  },
+  "id": "KS1yX6QSphy7CQShKXYm9",
+  "tags": []
+}
